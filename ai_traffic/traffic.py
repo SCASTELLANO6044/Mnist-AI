@@ -35,13 +35,26 @@ def main():
     model.fit(x_train, y_train, epochs=EPOCHS)
 
     # Evaluate neural network performance
-    model.evaluate(x_test,  y_test, verbose=2)
+    # model.evaluate(x_test,  y_test, verbose=2)
 
     # Save model to file
+    # if len(sys.argv) == 3:
+    #     filename = sys.argv[2]
+    #     model.save(filename)
+    #     print(f"Model saved to {filename}.")
+
     if len(sys.argv) == 3:
-        filename = sys.argv[2]
-        model.save(filename)
-        print(f"Model saved to {filename}.")
+        img_to_predict = cv2.imread(sys.argv[2])  # Replace with the path to your test image
+        img_to_predict = cv2.resize(img_to_predict, (IMG_WIDTH, IMG_HEIGHT))
+        img_to_predict = np.expand_dims(img_to_predict, axis=0)
+
+        # Make a prediction
+        prediction = model.predict(img_to_predict)
+
+        # Get the category with the highest probability
+        predicted_category = np.argmax(prediction)
+
+        print(f"Predicted category: {predicted_category}")
 
 
 def load_data(data_dir):
@@ -53,7 +66,7 @@ def load_data(data_dir):
     number of image files.
 
     Return tuple `(images, labels)`. `images` should be a list of all
-    of the images in the data directory, where each image is formatted as a
+    the images in the data directory, where each image is formatted as a
     numpy ndarray with dimensions IMG_WIDTH x IMG_HEIGHT x 3. `labels` should
     be a list of integer labels, representing the categories for each of the
     corresponding `images`.
@@ -68,7 +81,7 @@ def load_data(data_dir):
             clean_image = cv2.resize(raw_image, (IMG_WIDTH, IMG_HEIGHT))
 
             clean_image_list.append(clean_image)
-            label_list.append(int(folder))
+            label_list.append(folder)
 
     return clean_image_list, label_list
 
